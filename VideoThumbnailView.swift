@@ -15,7 +15,6 @@ struct VideoThumbnailView: View {
         Button(action: onTap) {
             GeometryReader { geometry in
                 ZStack {
-                    // Thumbnail
                     if let thumbnail = video.thumbnail {
                         Image(uiImage: thumbnail)
                             .resizable()
@@ -27,17 +26,13 @@ struct VideoThumbnailView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color.gray.opacity(0.3))
                     }
-                    
-                    // Selection overlay
                     if isSelected {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color.blue.opacity(0.3))
                             .frame(width: geometry.size.width, height: geometry.size.height)
                     }
                     
-                    // Play button or selection indicator
                     if isMultiSelectMode {
-                        // Selection circle
                         ZStack {
                             Circle()
                                 .fill(isSelected ? Color.blue : Color.clear)
@@ -55,8 +50,6 @@ struct VideoThumbnailView: View {
                         }
                         .position(x: geometry.size.width - 15, y: 15)
                     }
-                    
-                    // Duration label
                     Text(video.duration)
                         .font(.caption)
                         .fontWeight(.medium)
@@ -83,7 +76,6 @@ struct PhotoThumbnailView: View {
         Button(action: onTap) {
             GeometryReader { geometry in
                 ZStack {
-                    // Thumbnail
                     if let thumbnail = photo.thumbnail {
                         Image(uiImage: thumbnail)
                             .resizable()
@@ -95,15 +87,11 @@ struct PhotoThumbnailView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color.gray.opacity(0.3))
                     }
-
-                    // Selection overlay
                     if isSelected {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color.blue.opacity(0.3))
                             .frame(width: geometry.size.width, height: geometry.size.height)
                     }
-
-                    // Selection circle
                     if isMultiSelectMode {
                         ZStack {
                             Circle()

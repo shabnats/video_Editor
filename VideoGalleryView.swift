@@ -3,7 +3,7 @@ import PhotosUI
 
 struct VideoGalleryView: View {
     let onVideoSelected: (VideoItem) -> Void
-    let onPhotoSelected: (PhotoItem) -> Void  // Add this line
+    let onPhotoSelected: (PhotoItem) -> Void
     let onMultipleMediaSelected: ([VideoItem], [PhotoItem]) -> Void
 
     @State private var videos: [VideoItem] = []
@@ -33,7 +33,6 @@ struct VideoGalleryView: View {
             VStack(spacing: 0) {
                 StatusBarView()
 
-                // Header
                 HStack {
                     if isMultiSelectMode {
                         Button("Cancel") {
@@ -159,7 +158,7 @@ struct VideoGalleryView: View {
                                         if isMultiSelectMode {
                                             togglePhotoSelection(for: photo)
                                         } else {
-                                            onPhotoSelected(photo)  // Add this line
+                                            onPhotoSelected(photo)
                                         }
                                     }
                                 }
@@ -184,7 +183,6 @@ struct VideoGalleryView: View {
         } else {
             selectedVideos.insert(video.id)
         }
-        // Add debug logging
         print("DEBUG - Video selection toggled: \(video.id)")
         print("DEBUG - Selected videos count: \(selectedVideos.count)")
     }
@@ -195,7 +193,6 @@ struct VideoGalleryView: View {
         } else {
             selectedPhotos.insert(photo.id)
         }
-        // Add debug logging
         print("DEBUG - Photo selection toggled: \(photo.id)")
         print("DEBUG - Selected photos count: \(selectedPhotos.count)")
     }
@@ -209,8 +206,6 @@ struct VideoGalleryView: View {
     private func handleMultipleSelection() {
         let selectedVideoItems = videos.filter { selectedVideos.contains($0.id) }
         let selectedPhotoItems = photos.filter { selectedPhotos.contains($0.id) }
-        
-        // Debug logging
         print("DEBUG - handleMultipleSelection called")
         print("DEBUG - Selected video items: \(selectedVideoItems.count)")
         print("DEBUG - Selected photo items: \(selectedPhotoItems.count)")

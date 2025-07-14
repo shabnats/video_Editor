@@ -14,13 +14,13 @@ struct ContentView: View {
                     onVideoSelected: { video in
                         selectedVideo = video
                         selectedVideos = [video]
-                        selectedPhotos = [] // reset photos
+                        selectedPhotos = []
                         currentScreen = .preview
                     },
                     onPhotoSelected: { photo in
-                        selectedVideo = nil // reset video
-                        selectedVideos = [] // reset videos
-                        selectedPhotos = [photo] // set single photo
+                        selectedVideo = nil
+                        selectedVideos = []
+                        selectedPhotos = [photo]
                         currentScreen = .preview
                     },
                     onMultipleMediaSelected: { videos, photos in
@@ -58,13 +58,5 @@ struct ContentView: View {
             }
         }
         .navigationBarHidden(true)
-    }
-}
-
-// MARK: - Preview
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-            .preferredColorScheme(.dark)
     }
 }

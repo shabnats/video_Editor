@@ -12,16 +12,12 @@ class VideoMergerService: ObservableObject {
         
         Task {
             do {
-                // Convert photos to video assets first
                 var allAssets: [AVAsset] = []
-                
-                // Add video assets
                 for video in videos {
                     let asset = AVAsset(url: await getVideoURL(from: video.asset))
                     allAssets.append(asset)
                 }
                 
-                // Convert photos to video assets
                 for photo in photos {
                     if let photoAsset = await createVideoAsset(from: photo.asset, duration: CMTime(seconds: 3, preferredTimescale: 600)) {
                         allAssets.append(photoAsset)
@@ -32,8 +28,6 @@ class VideoMergerService: ObservableObject {
                 }
                 
                 print("Total assets converted: \(allAssets.count)")
-                
-                // Merge all assets
                 let mergedAsset = try await mergeAssets(allAssets)
                 
                 DispatchQueue.main.async {
@@ -59,7 +53,6 @@ class VideoMergerService: ObservableObject {
                 if let urlAsset = avAsset as? AVURLAsset {
                     continuation.resume(returning: urlAsset.url)
                 } else {
-                    // Create a temporary URL if needed
                     let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("temp_video_\(UUID().uuidString).mov")
                     continuation.resume(returning: tempURL)
                 }
@@ -68,7 +61,6 @@ class VideoMergerService: ObservableObject {
     }
     
     private func createVideoAsset(from photoAsset: PHAsset, duration: CMTime) async -> AVAsset? {
-        // Get the photo image first
         guard let image = await getImage(from: photoAsset) else {
             print("Failed to get image from photo asset")
             return nil
@@ -77,7 +69,6 @@ class VideoMergerService: ObservableObject {
         return await withCheckedContinuation { continuation in
             let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("photo_video_\(UUID().uuidString).mov")
             
-            // Create video from image
             createVideoFromImage(image: image, duration: duration, outputURL: tempURL) { success in
                 if success {
                     let asset = AVAsset(url: tempURL)
@@ -106,7 +97,6 @@ class VideoMergerService: ObservableObject {
     }
     
     private func createVideoFromImage(image: UIImage, duration: CMTime, outputURL: URL, completion: @escaping (Bool) -> Void) {
-        // Remove existing file if it exists
         if FileManager.default.fileExists(atPath: outputURL.path) {
             try? FileManager.default.removeItem(at: outputURL)
         }
@@ -195,7 +185,6 @@ class VideoMergerService: ObservableObject {
                     
                     writerInput.markAsFinished()
                     
-                    // Check writer status before finishing
                     guard assetWriter.status == .writing else {
                         print("Asset writer is not in writing state: \(assetWriter.status.rawValue)")
                         if let error = assetWriter.error {
@@ -243,8 +232,6 @@ class VideoMergerService: ObservableObject {
             print("Processing asset \(index + 1)/\(assets.count)")
             
             let assetDuration = asset.duration
-            
-            // Add video track
             if let assetVideoTrack = asset.tracks(withMediaType: .video).first {
                 do {
                     try videoTrack.insertTimeRange(
@@ -258,8 +245,6 @@ class VideoMergerService: ObservableObject {
                     throw error
                 }
             }
-            
-            // Add audio track if available
             if let assetAudioTrack = asset.tracks(withMediaType: .audio).first {
                 do {
                     try audioTrack.insertTimeRange(
@@ -270,7 +255,6 @@ class VideoMergerService: ObservableObject {
                     print("Added audio track for asset \(index + 1)")
                 } catch {
                     print("Failed to add audio track for asset \(index + 1): \(error)")
-                    // Don't throw error for audio track failure, just continue
                 }
             }
             

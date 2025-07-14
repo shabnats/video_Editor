@@ -5,7 +5,6 @@
 //  Created by macbook on 11/07/25.
 //
 
-
 import Foundation
 import AVFoundation
 import UIKit
@@ -21,7 +20,6 @@ class VideoTrimmingService: ObservableObject {
         }
         
         DispatchQueue.global(qos: .userInitiated).async {
-            // Create composition
             let composition = AVMutableComposition()
             let videoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
             let audioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
@@ -34,24 +32,16 @@ class VideoTrimmingService: ObservableObject {
                 return
             }
             
-            // Define time range for trimming
             let startCMTime = CMTime(seconds: startTime, preferredTimescale: 600)
             let endCMTime = CMTime(seconds: endTime, preferredTimescale: 600)
             let timeRange = CMTimeRange(start: startCMTime, end: endCMTime)
             
             do {
-                // Insert video track
                 try videoTrack?.insertTimeRange(timeRange, of: assetVideoTrack, at: .zero)
-                
-                // Insert audio track if available
                 if let assetAudioTrack = asset.tracks(withMediaType: .audio).first {
                     try audioTrack?.insertTimeRange(timeRange, of: assetAudioTrack, at: .zero)
                 }
-                
-                // Apply video track transform
                 videoTrack?.preferredTransform = assetVideoTrack.preferredTransform
-                
-                // Export the trimmed video
                 self.exportTrimmedVideo(composition: composition, completion: completion)
                 
             } catch {
@@ -64,15 +54,10 @@ class VideoTrimmingService: ObservableObject {
     }
     
     private func exportTrimmedVideo(composition: AVMutableComposition, completion: @escaping (Result<URL, Error>) -> Void) {
-        // Create output URL
         let outputURL = self.createTempVideoURL()
-        
-        // Remove existing file if it exists
         if FileManager.default.fileExists(atPath: outputURL.path) {
             try? FileManager.default.removeItem(at: outputURL)
         }
-        
-        // Create export session
         guard let exportSession = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality) else {
             DispatchQueue.main.async {
                 completion(.failure(VideoTrimmingError.exportSessionFailed))
@@ -84,8 +69,6 @@ class VideoTrimmingService: ObservableObject {
         exportSession.outputURL = outputURL
         exportSession.outputFileType = .mp4
         exportSession.shouldOptimizeForNetworkUse = true
-        
-        // Start export with progress monitoring
         let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             DispatchQueue.main.async {
                 self.progress = Double(exportSession.progress)

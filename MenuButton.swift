@@ -12,7 +12,6 @@ struct MenuButton: View {
     
     var body: some View {
         Button(action: {
-            // Handle menu button action
         }) {
             Image(systemName: icon)
                 .font(.system(size: 20))

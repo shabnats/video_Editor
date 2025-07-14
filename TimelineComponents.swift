@@ -18,9 +18,8 @@ struct DraggableTimelineView: View {
     
     private let timelineHeight: CGFloat = 30
     private let handleWidth: CGFloat = 8
-    private let minThumbnailWidth: CGFloat = 40 // Minimum width for each thumbnail
+    private let minThumbnailWidth: CGFloat = 40
     
-    // Sort media items by creation date (newest first)
     private var sortedMediaItems: [MediaItem] {
         return mediaItems.sorted { item1, item2 in
             let date1 = item1.creationDate ?? Date.distantPast
@@ -29,20 +28,15 @@ struct DraggableTimelineView: View {
         }
     }
     
-    // Calculate optimal number of thumbnails based on timeline width and total duration
     private func calculateOptimalThumbnailCount(for width: CGFloat) -> Int {
         guard totalTime > 0 else { return 0 }
         
-        // Calculate how many thumbnails can fit based on minimum width
         let maxThumbnailsByWidth = Int(width / minThumbnailWidth)
         
-        // For merged asset, use time-based calculation
         if mergedAsset != nil {
-            // 1 thumbnail per 2 seconds, but not more than what fits
             let timeBasedCount = max(1, Int(totalTime / 2))
             return min(timeBasedCount, maxThumbnailsByWidth)
         } else {
-            // For individual media items, base on content
             let contentBasedCount = max(1, sortedMediaItems.count * 2)
             return min(contentBasedCount, maxThumbnailsByWidth)
         }
@@ -109,17 +103,14 @@ struct DraggableTimelineView: View {
     
     private func trimOverlays(geometry: GeometryProxy) -> some View {
         HStack(spacing: 0) {
-            // Left overlay (before trim start)
             Rectangle()
                 .fill(Color.black.opacity(0.7))
                 .frame(width: startPosition(in: geometry.size.width))
             
-            // Clear section (selected area)
             Rectangle()
                 .fill(Color.clear)
                 .frame(width: selectedWidth(in: geometry.size.width))
             
-            // Right overlay (after trim end)
             Rectangle()
                 .fill(Color.black.opacity(0.7))
                 .frame(width: endOverlayWidth(in: geometry.size.width))
@@ -216,7 +207,6 @@ struct DraggableTimelineView: View {
             }
     }
     
-    // Helper functions
     private func startPosition(in width: CGFloat) -> CGFloat {
         return (trimStartTime / totalTime) * width
     }
@@ -237,11 +227,9 @@ struct DraggableTimelineView: View {
         return width - endPosition(in: width)
     }
     
-    // Generate thumbnails for the timeline
     private func generateTimelineThumbnails(for width: CGFloat) {
         let optimalCount = calculateOptimalThumbnailCount(for: width)
         
-        // If we have a merged asset, use it for thumbnails
         if let asset = mergedAsset {
             generateThumbnailsFromAsset(asset, count: optimalCount)
         } else {
@@ -276,7 +264,6 @@ struct DraggableTimelineView: View {
                 thumbnails.append(thumbnail)
             } catch {
                 print("Error generating thumbnail: \(error)")
-                // Add a placeholder thumbnail
                 thumbnails.append(createPlaceholderThumbnail())
             }
         }
@@ -301,8 +288,6 @@ struct DraggableTimelineView: View {
         var remainingThumbnails = count
         
         var completedItems = 0
-        
-        // Process each media item
         for (index, mediaItem) in sortedItems.enumerated() {
             let itemThumbnailCount = min(thumbnailsPerItem, remainingThumbnails)
             remainingThumbnails -= itemThumbnailCount
@@ -321,7 +306,6 @@ struct DraggableTimelineView: View {
                 }
                 
             case .photo(let photoItem):
-                // For photos, repeat the same thumbnail
                 for _ in 0..<itemThumbnailCount {
                     if let photoThumbnail = photoItem.thumbnail {
                         allThumbnails.append(photoThumbnail)
@@ -385,11 +369,9 @@ struct DraggableTimelineView: View {
         return renderer.image { context in
             let cgContext = context.cgContext
             
-            // Fill background
             UIColor.gray.withAlphaComponent(0.3).setFill()
             cgContext.fill(CGRect(origin: .zero, size: size))
             
-            // Add a camera icon (circle)
             let iconSize: CGFloat = 30
             let iconRect = CGRect(
                 x: (size.width - iconSize) / 2,

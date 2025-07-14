@@ -33,10 +33,8 @@ struct VideoEditorView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
-                // Status Bar
                 StatusBarView()
 
-                // Header
                 HStack {
                     Button(action: {
                         showCloseAlert = true
@@ -56,9 +54,7 @@ struct VideoEditorView: View {
                 .padding(.vertical, 15)
                 .background(Color.black)
                 
-                // Video Preview + Overlay Menu Buttons
                 ZStack(alignment: .topTrailing) {
-                    // Video Player Container
                     ZStack {
                         if let video = video {
                             VideoPlayerView(
@@ -79,8 +75,6 @@ struct VideoEditorView: View {
                                 .aspectRatio(9/16, contentMode: .fit)
                                 .padding(.horizontal, 20)
                         }
-                        
-                        // Play/Pause Button Overlay
                         if showPlayButton {
                             Button(action: togglePlayPause) {
                                 Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
@@ -96,7 +90,6 @@ struct VideoEditorView: View {
                             showPlayButton.toggle()
                         }
                         
-                        // Auto-hide play button after 2 seconds
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 showPlayButton = false
@@ -104,7 +97,6 @@ struct VideoEditorView: View {
                         }
                     }
                     
-                    // Menu Buttons
                     VStack(spacing: 20) {
                         MenuButton(icon: "textformat")
                         MenuButton(icon: "music.note")
@@ -117,10 +109,8 @@ struct VideoEditorView: View {
                 .padding(.top, 20)
                 .background(Color.black)
                 
-                // Spacer to push timeline to bottom
                 Spacer()
                 
-                // Timeline + Buttons (Fixed bottom section)
                 VStack(spacing: 15) {
                     Text(String(format: "%.1f/%.1f", currentTime, totalTime))
                         .font(.system(size: 16, weight: .medium))
@@ -138,7 +128,6 @@ struct VideoEditorView: View {
                     
                     HStack(spacing: 20) {
                         Button("Save Draft") {
-                            // Handle save draft
                         }
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.white)
@@ -150,7 +139,6 @@ struct VideoEditorView: View {
                         )
                         Spacer()
                         Button("Share") {
-                            // Handle share
                         }
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.white)
@@ -178,7 +166,6 @@ struct VideoEditorView: View {
             }
         }
         .onDisappear {
-            // Pause video when leaving view
             isPlaying = false
         }
         .alert("Close Now?", isPresented: $showCloseAlert) {
@@ -197,8 +184,6 @@ struct VideoEditorView: View {
     private func togglePlayPause() {
         isPlaying.toggle()
         showPlayButton = true
-        
-        // Auto-hide play button after 1 second when playing
         if isPlaying {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 withAnimation(.easeInOut(duration: 0.3)) {
@@ -210,7 +195,6 @@ struct VideoEditorView: View {
     
     private func seekToTime(_ time: Double) {
         currentTime = time
-        // The VideoPlayerView will handle the actual seeking through its coordinator
     }
 
     private func generateVideoThumbnails() {

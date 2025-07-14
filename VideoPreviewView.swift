@@ -22,7 +22,6 @@ struct VideoPreviewView: View {
     
     @StateObject private var videoMerger = VideoMergerService()
     
-    // All media items combined and sorted
     private var allMediaItems: [MediaItem] {
         let videoItems = selectedVideos.map { MediaItem.video($0) }
         let photoItems = selectedPhotos.map { MediaItem.photo($0) }
@@ -347,11 +346,9 @@ struct VideoPreviewView: View {
     
     private func handleSwipeGesture(_ value: DragGesture.Value) {
         if value.translation.width > 50 && currentMediaIndex > 0 {
-            // Swipe right - previous media
             currentMediaIndex -= 1
             updateMediaDisplay()
         } else if value.translation.width < -50 && currentMediaIndex < allMediaItems.count - 1 {
-            // Swipe left - next media
             currentMediaIndex += 1
             updateMediaDisplay()
         }
@@ -370,13 +367,9 @@ struct VideoPreviewView: View {
     
     private func setupMedia() {
         print("Setting up media - Videos: \(selectedVideos.count), Photos: \(selectedPhotos.count)")
-        
-        // Always show media strip if there are multiple items
         if allMediaItems.count > 1 {
             showingMediaStrip = true
         }
-        
-        // Check if we need to merge media
         let needsMerging = selectedVideos.count > 1 || selectedPhotos.count > 0
         
         if needsMerging {
@@ -395,21 +388,18 @@ struct VideoPreviewView: View {
                         self.isLoading = false
                     case .failure(let error):
                         print("Error merging media: \(error.localizedDescription)")
-                        // Fall back to showing individual items
                         self.handleMergingFailure()
                     }
                 }
             }
         } else if let firstVideo = selectedVideos.first {
             print("Single video case")
-            // Single video case
             totalTime = firstVideo.asset.duration
             trimEndTime = totalTime
             generateVideoThumbnails(for: firstVideo)
             isLoading = false
         } else if let firstPhoto = selectedPhotos.first {
             print("Single photo case")
-            // Single photo case - no video player needed
             isLoading = false
             showPlayButton = false
         } else {
@@ -423,14 +413,11 @@ struct VideoPreviewView: View {
         isLoading = false
         mergedAsset = nil
         
-        // If we have at least one video, show it
         if let firstVideo = selectedVideos.first {
             totalTime = firstVideo.asset.duration
             trimEndTime = totalTime
             generateVideoThumbnails(for: firstVideo)
         }
-        
-        // Reset to first media item
         currentMediaIndex = 0
         updateMediaDisplay()
     }
@@ -441,7 +428,6 @@ struct VideoPreviewView: View {
             
             switch currentMedia {
             case .video(let videoItem):
-                // If we're showing a merged video, don't change the timeline
                 if mergedAsset == nil {
                     totalTime = videoItem.asset.duration
                     trimEndTime = totalTime
@@ -449,7 +435,6 @@ struct VideoPreviewView: View {
                 }
                 showPlayButton = true
             case .photo:
-                // Reset video-specific states
                 isPlaying = false
                 showPlayButton = false
             }
